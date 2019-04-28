@@ -72,7 +72,7 @@ h1 {
 	//在视图中添加建筑模型实体
 	
 	
-    var entity = viewer.entities.add({
+   /*  var entity = viewer.entities.add({
     	//深圳市民中心经纬度
          position: Cesium.Cartesian3.fromDegrees(114.05444092992921,22.54582408990844),
          name:"深圳市民中心",
@@ -80,7 +80,26 @@ h1 {
         	 uri: '3Dmodels/新洲酒店.gltf'
          },
          
-     }); 
+     });  */
+	
+    $.ajax({
+		url:"./3Dmodels/models.json",
+		dataType:"json",
+		success:function(res){
+			var models = res.models
+			for(var i=0; i<models.length;i++){
+				viewer.entities.add({
+					position:Cesium.Cartesian3.fromDegrees(models[i].positionLon,models[i].positionLat),
+					name:models[i].name,
+					model:{
+						uri:models[i].uri
+					}
+				})
+			}
+			
+		}
+	})
+
     
     
     
