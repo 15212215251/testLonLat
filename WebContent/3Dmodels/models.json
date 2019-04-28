@@ -1,0 +1,8 @@
+{
+	"models":[{
+		"positionLon":"114.04883128692221",
+		"positionLat":"22.548354555049524",
+		"name":"测试",
+		"uri":"./3Dmodels/测试.gltf"
+	}]
+}

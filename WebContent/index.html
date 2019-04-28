@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>微调模型校准</title>
+<script src="./Cesium/Cesium.js"></script>
+
+<style>
+@import url("./Cesium/Widgets/widgets.css");
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#cesiumContainer {
+	height: 95%;
+}
+h1 {
+	heigth: 5%;
+}
+</style>
+</head>
+<body>
+	<div id="cesiumContainer"></div>
+	<script>
+	var viewer = new Cesium.Viewer('cesiumContainer');
+	
+	
+	 //页面中拖动模型
+	 viewer.screenSpaceEventHandler.setInputAction(leftDownAction,Cesium.ScreenSpaceEventType.LEFT_DOWN);
+	 viewer.screenSpaceEventHandler.setInputAction(letfUpAction,Cesium.ScreenSpaceEventType.LEFT_UP);
+	 viewer.screenSpaceEventHandler.setInputAction(mouseMoveAction,Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	//左键按下flag
+	 var isleftDown = false;
+	//定义一个拖拽的对象
+	 var pointDraged;
+	//左键按下鼠标事件方法
+	 function leftDownAction(e){
+	     console.log('左键按下了...');
+	     pointDraged = viewer.scene.pick(e.position);
+	     isleftDown = true;
+	     if(pointDraged){
+	         viewer.scene.screenSpaceCameraController.enableRotate = false;
+	     }
+	 }
+	//左键抬起鼠标事件方法
+	 function letfUpAction(e){
+	     console.log('左键抬起');
+	     isleftDown = false;
+	     pointDraged = null;
+	     viewer.scene.screenSpaceCameraController.enableRotate = true;
+	 }
+	//鼠标拖动模型事件方法
+	 function mouseMoveAction(e){
+	     if(isleftDown == true && pointDraged !== null){
+	         console.log('鼠标移动');
+	         let ray = viewer.camera.getPickRay(e.endPosition);
+	         let cartesian = viewer.scene.globe.pick(ray,viewer.scene);
+	         console.log(cartesian);
+	         var cartographic = Cesium.Cartographic.fromCartesian(cartesian); //根据笛卡尔坐标获取到弧度
+	          var lng = Cesium.Math.toDegrees(cartographic.longitude); //根据弧度获取到经度
+	         var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
+	         console.log('经纬度:'+lng+','+lat);
+	         if(pointDraged !== null){
+	        	 pointDraged.id.position=cartesian;
+	         }
+	     }
+	 } 
+	//在视图中添加建筑模型实体
+	
+	
+    var entity = viewer.entities.add({
+    	//深圳市民中心经纬度
+         position: Cesium.Cartesian3.fromDegrees(114.05444092992921,22.54582408990844),
+         name:"深圳市民中心",
+         model: {
+        	 uri: '3Dmodels/新洲酒店.gltf'
+         },
+         
+     }); 
+    
+    
+    
+    //相机定位（视角会自动定位到这个位置，动画切换视角，不会对模型进行相机锁定）
+    viewer.camera.flyTo({
+		//给定一个相机视角的位置
+		destination: Cesium.Cartesian3.fromDegrees(114.054617983413,22.53336814594387,1500)
+	})
+    
+    //追踪模型，同时相机锁定
+   // viewer.trackedEntity=entity;
+	</script>
+
+
+</body>
+</html>
